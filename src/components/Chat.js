@@ -9,6 +9,7 @@ class Chat extends React.Component {
     messages: [],
     lastLoadedMessageId: 0,
     loading: true,
+    firstLoading: true,
     error: null,
     userId: '',
     messageText: '',
@@ -17,6 +18,8 @@ class Chat extends React.Component {
   };
 
   timeout = null;
+
+  messageListRef = React.createRef();
 
   loadMessages = () => {
     this.setState({
@@ -35,6 +38,7 @@ class Chat extends React.Component {
                 )
               : this.state.lastLoadedMessageId,
           loading: false,
+          firstLoading: false,
           sending: false,
           error: null,
           updated: new Date(),
@@ -88,6 +92,13 @@ class Chat extends React.Component {
     if (oldState.updated !== this.state.updated) {
       this.timeout = window.setTimeout(() => this.loadMessages(), 3 * 1000);
     }
+    if (
+      (oldState.firstLoading && !this.state.firstLoading) ||
+      (oldState.sending && !this.state.sending)
+    ) {
+      this.messageListRef.current.scrollTop =
+        this.messageListRef.current.scrollHeight;
+    }
   }
 
   componentWillUnmount() {
@@ -97,7 +108,7 @@ class Chat extends React.Component {
   render() {
     return (
       <div className="container">
-        <div className="message-list">
+        <div className="message-list" ref={this.messageListRef}>
           {this.state.messages.map((message) => (
             <Message
               key={message.id}
