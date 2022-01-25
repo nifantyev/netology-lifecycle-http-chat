@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import React from 'react';
 import Message from './Message';
+import MessageForm from './MessageForm';
 
 const API_URL = 'http://localhost:7777';
 
@@ -12,7 +13,6 @@ class Chat extends React.Component {
     firstLoading: true,
     error: null,
     userId: '',
-    messageText: '',
     sending: false,
     updated: null,
   };
@@ -52,8 +52,7 @@ class Chat extends React.Component {
       });
   };
 
-  handleSubmit = (event) => {
-    event.preventDefault();
+  handleNewMessage = (messageText) => {
     fetch(`${API_URL}/messages`, {
       method: 'POST',
       headers: {
@@ -62,12 +61,10 @@ class Chat extends React.Component {
       body: JSON.stringify({
         id: 0,
         userId: this.state.userId,
-        content: this.state.messageText,
+        content: messageText,
       }),
     })
-      .then((response) =>
-        this.setState({ messageText: '', sending: true, error: null })
-      )
+      .then((response) => this.setState({ sending: true, error: null }))
       .catch((error) => this.setState({ error: error.message }));
   };
 
@@ -117,19 +114,8 @@ class Chat extends React.Component {
             />
           ))}
         </div>
-        <form className="message-form" onSubmit={this.handleSubmit}>
-          <div className="message-input-wrapper">
-            <input
-              className="message-input"
-              name="messageText"
-              value={this.state.messageText}
-              onChange={this.handleChange}
-            />
-            <button className="message-submit" type="submit">
-              <span className="material-icons">send</span>
-            </button>
-          </div>
-        </form>
+        <p>Hi</p>
+        <MessageForm onSubmit={this.handleNewMessage} />
         {this.state.sending && <span>...</span>}
         <div className="error">{this.state.error}</div>
       </div>
